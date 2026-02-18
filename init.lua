@@ -630,6 +630,47 @@ require('lazy').setup({
         vim.lsp.enable(name)
       end
 
+      vim.filetype.add {
+        extension = {
+          tf = 'terraform',
+          tofu = 'terraform',
+          tfvars = 'terraform-vars',
+        },
+      }
+      vim.lsp.enable 'terraformls'
+      --    vim.lsp.config('terraformls', {
+      --      on_init = function(client)
+      --        client.config.settings.terraform = vim.tbl_deep_extend('force', client.config.settings.terraform, {
+      --          experimentalFeatures = {
+      --            prefillRequiredFields = true,
+      --          },
+      --        })
+      --      end,
+      --    })
+      vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+        pattern = { '*.tf', '*.tfvars' },
+        callback = function() vim.lsp.buf.format() end,
+      })
+
+      vim.lsp.config('terragrunt-ls', {
+        cmd = { 'terragrunt-ls' },
+        filetypes = { 'hcl' },
+        ft = 'hcl',
+        config = function()
+          local terragrunt_ls = require 'terragrunt-ls'
+          terragrunt_ls.setup {
+            cmd_env = {},
+          }
+          if terragrunt_ls.client then
+            vim.api.nvim_create_autocmd('FileType', {
+              pattern = 'hcl',
+              callback = function() vim.lsp.buf_attach_client(0, terragrunt_ls.client) end,
+            })
+          end
+        end,
+      })
+      vim.lsp.enable 'terragrunt-ls'
+
       -- Special Lua Config, as recommended by neovim help docs
       vim.lsp.config('lua_ls', {
         on_init = function(client)
@@ -856,7 +897,7 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     config = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'terraform', 'opentofu' }
       require('nvim-treesitter').install(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
