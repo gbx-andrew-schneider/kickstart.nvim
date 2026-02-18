@@ -666,6 +666,74 @@ require('lazy').setup({
         vim.lsp.config(name, server)
         vim.lsp.enable(name)
       end
+
+      vim.filetype.add {
+        extension = {
+          tf = 'terraform',
+          tofu = 'terraform',
+          tfvars = 'terraform-vars',
+        },
+      }
+      vim.lsp.enable 'terraformls'
+      --    vim.lsp.config('terraformls', {
+      --      on_init = function(client)
+      --        client.config.settings.terraform = vim.tbl_deep_extend('force', client.config.settings.terraform, {
+      --          experimentalFeatures = {
+      --            prefillRequiredFields = true,
+      --          },
+      --        })
+      --      end,
+      --    })
+      vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+        pattern = { '*.tf', '*.tfvars' },
+        callback = function() vim.lsp.buf.format() end,
+      })
+
+      vim.lsp.config('terragrunt-ls', {
+        cmd = { 'terragrunt-ls' },
+        filetypes = { 'hcl' },
+        ft = 'hcl',
+        config = function()
+          local terragrunt_ls = require 'terragrunt-ls'
+          terragrunt_ls.setup {
+            cmd_env = {},
+          }
+          if terragrunt_ls.client then
+            vim.api.nvim_create_autocmd('FileType', {
+              pattern = 'hcl',
+              callback = function() vim.lsp.buf_attach_client(0, terragrunt_ls.client) end,
+            })
+          end
+        end,
+      })
+      vim.lsp.enable 'terragrunt-ls'
+
+      -- Special Lua Config, as recommended by neovim help docs
+      vim.lsp.config('lua_ls', {
+        on_init = function(client)
+          if client.workspace_folders then
+            local path = client.workspace_folders[1].name
+            if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
+          end
+
+          client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+            runtime = {
+              version = 'LuaJIT',
+              path = { 'lua/?.lua', 'lua/?/init.lua' },
+            },
+            workspace = {
+              checkThirdParty = false,
+              -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
+              --  See https://github.com/neovim/nvim-lspconfig/issues/3189
+              library = vim.api.nvim_get_runtime_file('', true),
+            },
+          })
+        end,
+        settings = {
+          Lua = {},
+        },
+      })
+      vim.lsp.enable 'lua_ls'
     end,
   },
 
@@ -880,7 +948,7 @@ require('lazy').setup({
     branch = 'main',
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter-intro`
     config = function()
-      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'terraform', 'opentofu' }
       require('nvim-treesitter').install(parsers)
       vim.api.nvim_create_autocmd('FileType', {
         callback = function(args)
