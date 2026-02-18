@@ -674,6 +674,7 @@ require('lazy').setup({
         cmd = { 'terragrunt-ls' },
         filetypes = { 'hcl' },
         ft = 'hcl',
+        root_markers = { '.git', 'root.hcl' },
         config = function()
           local terragrunt_ls = require 'terragrunt-ls'
           terragrunt_ls.setup {
