@@ -715,15 +715,6 @@ require('lazy').setup({
         },
       }
       vim.lsp.enable 'terraformls'
-      --    vim.lsp.config('terraformls', {
-      --      on_init = function(client)
-      --        client.config.settings.terraform = vim.tbl_deep_extend('force', client.config.settings.terraform, {
-      --          experimentalFeatures = {
-      --            prefillRequiredFields = true,
-      --          },
-      --        })
-      --      end,
-      --    })
       vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
         pattern = { '*.tf', '*.tfvars' },
         callback = function() vim.lsp.buf.format() end,
