@@ -687,6 +687,7 @@ require('lazy').setup({
         'lua-language-server', -- Lua Language server
         'stylua', -- Used to format Lua code
         'bash-language-server',
+        'json-lsp',
         -- You can add other tools here that you want Mason to install
       })
 
@@ -695,6 +696,9 @@ require('lazy').setup({
       servers = vim.tbl_deep_extend('force', {}, servers, {
         ['bashls'] = {
           filetypes = { 'bash', 'sh', 'zsh' },
+        },
+        ['jsonls'] = {
+          filetypes = { 'json', 'jsonc' },
         },
       })
 
