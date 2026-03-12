@@ -525,7 +525,7 @@ require('lazy').setup({
       { 'j-hui/fidget.nvim', opts = {
         notification = {
           window = {
-            winblend = false,
+            winblend = 0,
           },
         },
       } },
