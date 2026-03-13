@@ -688,6 +688,7 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
         'bash-language-server',
         'json-lsp',
+        'yaml-language-server',
         -- You can add other tools here that you want Mason to install
       })
 
@@ -700,6 +701,7 @@ require('lazy').setup({
         ['jsonls'] = {
           filetypes = { 'json', 'jsonc' },
         },
+        ['yamlls'] = {},
       })
 
       for name, server in pairs(servers) do
